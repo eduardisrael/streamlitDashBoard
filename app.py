@@ -18,4 +18,9 @@ def cargar_datos():
 
 data = cargar_datos()
 
-st.write(data)
+st.sidebar.subheader("Mostrar tweets aleatorios")
+random_tweet = st.sidebar.radio('Sentimento',('positive','neutral','negative')) #depende del csv
+
+#consultar nuestro marco de datos, especificamente Airline, con el sentimiento
+ #texto de la columna de datos, funcion sample (muestras azar)de pandas, solo uno, nuestra texto columna 0,0
+st.sidebar.markdown(data.query('airline_sentiment == @random_tweet')[["text"]].sample(n=1).iat[0,0])
