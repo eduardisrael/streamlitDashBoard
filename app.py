@@ -4,7 +4,7 @@ import streamlit as st
 import  pandas as pd
 import numpy as np
 import plotly.express as px
-from wordcloud import wordcloud, STOPWORDS
+from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 
 st.title("Análisis de Sentimientos de los Tweets: Aerolíneas")
@@ -91,7 +91,32 @@ if (len(opcion)) > 0:
 
 
 st.sidebar.header("Word Cloud")
-word_sentiment = st.sidebar.radio('Mostrar 'WordCloud', ¿Que sentimento?',('positve','neutral','negative'))
+word_sentiment = st.sidebar.radio('Mostrar WordCloud, ¿Que sentimento?',('positive','neutral','negative'))
+
+if not st.sidebar.checkbox("Ocultar", True, key=3):
+    st.header('Word Cloud: %s' % (word_sentiment))
+    df = data[data['airline_sentiment']==word_sentiment]
+
+    #creamos una lista de palabras a partir de la modificacion
+    #Especificamente estamos tomando nuestro datos de esta columna texto en nuestro subconjunto modificado
+    words = ' '.join(df['text'])
+
+    #eliminar todo lo que no sean palabras: menciones,https, etc
+    processed_words = ' '.join([word for word in words.split() if 'http' not in word and not word.startswith('@') and word != 'RT'])
+    
+    #STOPWORDS: common words, like articles, punctuation, eliminar sesgo 
+    wordcloud = WordCloud(stopwords=STOPWORDS, background_color='white', height=640, width=800).generate(processed_words) 
+
+    #image, xticks: listas vacias
+    plt.imshow(wordcloud)
+    plt.xticks([])
+    plt.yticks([])
+    st.pyplot()
+
+
+
+
+
 
 
 
