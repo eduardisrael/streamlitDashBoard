@@ -1,13 +1,17 @@
+#Israel Pasaca
+
 import streamlit as st
 import  pandas as pd
 import numpy as np
 import plotly.express as px
+from wordcloud import wordcloud, STOPWORDS
+import matplotlib.pyplot as plt
 
-st.title("Analisis de Sentimientos de los Tweets sobre las Aerolineas")
-st.sidebar.title("Analisis de Sentimientos de los tweets: Aerolineas")
+st.title("Análisis de Sentimientos de los Tweets: Aerolíneas")
+st.sidebar.title("Análisis de Sentimientos de los tweets: Aerolíneas")
 
 st.markdown("Esta App es un Streamlit Dashboard para analisis los sentimientos de los tweets 🐦")
-st.sidebar.markdown("Esta App es un Streamlit Dashboard para analisis los sentimientos de los tweets 🐦")
+st.sidebar.markdown("Esta App es un Streamlit Dashboard para análisis los sentimientos de los tweets 🐦")
 
 DATA_URL = ("./Tweets.csv")
 
@@ -27,6 +31,7 @@ random_tweet = st.sidebar.radio('Sentimento',('positive','neutral','negative')) 
 st.sidebar.markdown(data.query('airline_sentiment == @random_tweet')[["text"]].sample(n=1).iat[0,0])
 
 st.sidebar.markdown("### Numero de tweets por sentimiento")
+
 #Widget, agregamos parametro key=1, nos permite es usar el cuadro de seleccion de la barra
 seleccion = st.sidebar.selectbox('Tipo de Visualizacion',['Histograma','Pie Chart'], key='1')
 
@@ -52,11 +57,11 @@ if not st.sidebar.checkbox("Ocultar", True):
 #solo si existe Latitud, longitud or long,short st.map(data)
 #hour= st.sidebar.number_input("Hora del día", min_value=1, max_value=24)
 #libreria de pandas para filtrar datos por la hora del dia 
-st.sidebar.subheader("¿Cuando y de donde estan enviando Tweets los usuarios?")
+st.sidebar.subheader("¿Dónde y cuándo estan enviando Tweets los usuarios?")
 hora = st.sidebar.slider("Hora del día", 0, 23)
 datosModificados = data[data["tweet_created"].dt.hour == hora]
 
-if not st.sidebar.checkbox("Cerrar", True, key='1'):
+if not st.sidebar.checkbox("Ocultar", True, key='1'):
     st.markdown("### Ubicacion de los tweets por hora del día")
 
     #numero de tweets en total, hora, incremento/finaliza, arthm values limited
@@ -70,13 +75,23 @@ if not st.sidebar.checkbox("Cerrar", True, key='1'):
         st.write(datosModificados)
 
 
+st.sidebar.subheader("Desglose de Tweets por sentimiento")
+opcion = st.sidebar.multiselect("Selecciona Aerolinea",('US Airways', 'United', 'American', 'Southwest', 'Delta', 'Virgin America'), key=0)
+
+if (len(opcion)) > 0:
+    #Aseguramos seleccionar aerolineas correctas, desde el marco de datos retornado un subconjunto
+    data_opcion = data[data.airline.isin(opcion)]
+    
+    #histfunc eje y, tramas - cada opcion 3 bar plots
+    #Label: diccionario de etiquetas
+    fig_opcion = px.histogram(data_opcion, x='airline', y='airline_sentiment', histfunc='count',
+                 color='airline_sentiment', facet_col='airline_sentiment', labels={'airline_sentiment':'tweets'}, 
+                 height=600, width=800)
+    st.plotly_chart(fig_opcion)
 
 
-
-
-
-
-
+st.sidebar.header("Word Cloud")
+word_sentiment = st.sidebar.radio('Mostrar 'WordCloud', ¿Que sentimento?',('positve','neutral','negative'))
 
 
 
